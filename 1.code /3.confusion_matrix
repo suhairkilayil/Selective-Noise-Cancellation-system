@@ -1,0 +1,124 @@
+# --------------------------------------------------
+# 1️⃣ Import Required Libraries
+# --------------------------------------------------
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from tensorflow.keras.models import load_model
+from sklearn.metrics import confusion_matrix, classification_report
+from tensorflow.keras.utils import to_categorical
+from sklearn.model_selection import train_test_split
+import librosa
+import librosa.display
+import soundfile as sf
+
+# --------------------------------------------------
+# 2️⃣ Load Your Trained Model
+# --------------------------------------------------
+model_path = "/content/drive/MyDrive/SelectiveNoiseCancellationOutput/UrbanSound_CNN_FinalModel.h5"
+model = load_model(model_path)
+print("✅ Model loaded successfully from:", model_path)
+
+# --------------------------------------------------
+# 3️⃣ Reload Dataset (for Confusion Matrix)
+# --------------------------------------------------
+base_path = "/content/drive/MyDrive/UrbanSound8K/UrbanSound8K/audio/"
+SR = 22050
+N_MELS = 64
+DURATION = 4
+SAMPLES_PER_TRACK = SR * DURATION
+
+def extract_mel(file_path):
+    signal, sr = librosa.load(file_path, sr=SR)
+    if len(signal) < SAMPLES_PER_TRACK:
+        signal = np.pad(signal, (0, SAMPLES_PER_TRACK - len(signal)))
+    else:
+        signal = signal[:SAMPLES_PER_TRACK]
+    mel = librosa.feature.melspectrogram(y=signal, sr=sr, n_mels=N_MELS)
+    mel_db = librosa.power_to_db(mel, ref=np.max)
+    return mel_db
+
+X, y = [], []
+for fold in range(1, 11):
+    fold_path = os.path.join(base_path, f"fold{fold}")
+    for file in os.listdir(fold_path):
+        if file.endswith(".wav"):
+            label = int(file.split("-")[1])
+            mel = extract_mel(os.path.join(fold_path, file))
+            X.append(mel)
+            y.append(label)
+
+X = np.array(X)[..., np.newaxis]
+y = np.array(y)
+y_cat = to_categorical(y, num_classes=10)
+
+X_train, X_test, y_train, y_test = train_test_split(X, y_cat, test_size=0.2, random_state=42)
+
+# --------------------------------------------------
+# 4️⃣ Evaluate the Model
+# --------------------------------------------------
+test_loss, test_acc = model.evaluate(X_test, y_test)
+print(f"🔧 Test Accuracy: {test_acc*100:.2f}%")
+print(f"🔧 Test Loss: {test_loss:.4f}")
+
+# --------------------------------------------------
+# 5️⃣ Generate Confusion Matrix
+# --------------------------------------------------
+y_pred = model.predict(X_test)
+y_pred_classes = np.argmax(y_pred, axis=1)
+y_true = np.argmax(y_test, axis=1)
+
+labels = ['air_conditioner', 'car_horn', 'children_playing', 'dog_bark', 'drilling',
+          'engine_idling', 'gun_shot', 'jackhammer', 'siren', 'street_music']
+
+cm = confusion_matrix(y_true, y_pred_classes)
+
+plt.figure(figsize=(10, 8))
+sns.heatmap(cm, annot=True, fmt='d', cmap='coolwarm', xticklabels=labels, yticklabels=labels)
+plt.title('Confusion Matrix of UrbanSound CNN Model')
+plt.xlabel('Predicted Label')
+plt.ylabel('True Label')
+plt.xticks(rotation=45)
+plt.yticks(rotation=45)
+plt.tight_layout()
+
+cm_path = "/content/drive/MyDrive/SelectiveNoiseCancellationOutput/Confusion_Matrix.png"
+plt.savefig(cm_path)
+plt.show()
+print(f"✅ Confusion matrix saved to: {cm_path}")
+
+# --------------------------------------------------
+# 6️⃣ Accuracy & Loss Graphs (If you have 'history')
+# --------------------------------------------------
+try:
+    plt.figure(figsize=(12, 5))
+
+    # Accuracy
+    plt.subplot(1, 2, 1)
+    plt.plot(history.history['accuracy'], label='Training Accuracy', color='green')
+    plt.plot(history.history['val_accuracy'], label='Validation Accuracy', color='blue')
+    plt.title('Model Accuracy per Epoch')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.legend()
+    plt.grid(True)
+
+    # Loss
+    plt.subplot(1, 2, 2)
+    plt.plot(history.history['loss'], label='Training Loss', color='red')
+    plt.plot(history.history['val_loss'], label='Validation Loss', color='orange')
+    plt.title('Model Loss per Epoch')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.grid(True)
+
+    plt.tight_layout()
+    graph_path = "/content/drive/MyDrive/SelectiveNoiseCancellationOutput/Accuracy_Loss_Curve.png"
+    plt.savefig(graph_path)
+    plt.show()
+    print(f"✅ Accuracy/Loss graphs saved to: {graph_path}")
+
+except NameError:
+    print("⚠️ 'history' object not found — if you trained earlier, please re-run training or save history to plot accuracy/loss.")
