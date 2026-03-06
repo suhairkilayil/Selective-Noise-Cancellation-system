@@ -1,0 +1,22 @@
+UrbanSound8K Dataset
+
+The dataset used in this project can be downloaded from the following link:
+
+https://drive.google.com/drive/folders/1tF_kVK6JVYXym3GS7M4k_X3F4lAZU0Bd?usp=drive_link
+
+Original Dataset: UrbanSound8K
+
+Description:
+The UrbanSound8K dataset contains 8732 labeled audio clips (<=4 seconds) from 10 urban sound classes such as sirens, car horns, dog barks, drilling, and street music. :contentReference[oaicite:0]{index=0}
+
+Dataset Classes:
+- Air Conditioner
+- Car Horn
+- Children Playing
+- Dog Bark
+- Drilling
+- Engine Idling
+- Gun Shot
+- Jackhammer
+- Siren
+- Street Music
