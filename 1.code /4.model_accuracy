@@ -1,0 +1,75 @@
+# ✅ Accuracy & Loss Graphs from Logged Values
+import matplotlib.pyplot as plt
+
+# --------------------------------------------
+# Step 1️⃣  Manually reconstructed training log
+# --------------------------------------------
+
+accuracy = [
+    0.2159, 0.3330, 0.3744, 0.4276, 0.4704, 0.5268, 0.5347, 0.5499, 0.6030,
+    0.6397, 0.6702, 0.6900, 0.7069, 0.7210, 0.7559, 0.7661, 0.7657, 0.7619,
+    0.7814, 0.7929, 0.8046, 0.8188, 0.8286, 0.8369, 0.8417, 0.8652, 0.8772,
+    0.8653, 0.8665, 0.8805, 0.8852, 0.8862, 0.8949, 0.9076, 0.8879, 0.9157,
+    0.8957, 0.9022, 0.9213, 0.9204, 0.9211, 0.9238
+]
+
+val_accuracy = [
+    0.3207, 0.3286, 0.4657, 0.4636, 0.5357, 0.5364, 0.4886, 0.6786, 0.6429,
+    0.7493, 0.3714, 0.7657, 0.4993, 0.7721, 0.7121, 0.4850, 0.6479, 0.7143,
+    0.7943, 0.7079, 0.6936, 0.7650, 0.8336, 0.8400, 0.8536, 0.8350, 0.8271,
+    0.7557, 0.8779, 0.8607, 0.8486, 0.8921, 0.7321, 0.8421, 0.5871, 0.8507,
+    0.8979, 0.8086, 0.9021, 0.7343, 0.9079, 0.8464
+]
+
+loss = [
+    5.5526, 1.8404, 1.7104, 1.5496, 1.4159, 1.2643, 1.2472, 1.1543, 1.0511,
+    0.9387, 0.8990, 0.8281, 0.7956, 0.7469, 0.6794, 0.6484, 0.6383, 0.6230,
+    0.6006, 0.5450, 0.5401, 0.5328, 0.4873, 0.4359, 0.4760, 0.3845, 0.3673,
+    0.3856, 0.3793, 0.3550, 0.3305, 0.3460, 0.3015, 0.2670, 0.3351, 0.2641,
+    0.3385, 0.2946, 0.2338, 0.2520, 0.2336, 0.2179
+]
+
+val_loss = [
+    3.4904, 1.9716, 1.5427, 1.7677, 1.2813, 1.2884, 1.5252, 0.9420, 1.0043,
+    0.7611, 3.4651, 0.7415, 2.3802, 0.7317, 0.9884, 3.1362, 1.5090, 0.9910,
+    0.7520, 0.9295, 1.0070, 0.9114, 0.6432, 0.5336, 0.5843, 0.6274, 0.6011,
+    1.5600, 0.4555, 0.5421, 0.6383, 0.4330, 1.2827, 0.6972, 0.5589, 0.6754,
+    0.4418, 0.9086, 0.4333, 0.4556, 0.4868, 0.6634
+]
+
+# ------------------------------------------------
+# Step 2️⃣  Plot Accuracy and Loss Curves
+# ------------------------------------------------
+epochs = range(1, len(accuracy) + 1)
+plt.figure(figsize=(12, 5))
+
+# Accuracy Plot
+plt.subplot(1, 2, 1)
+plt.plot(epochs, accuracy, label='Training Accuracy', color='green', linewidth=2)
+plt.plot(epochs, val_accuracy, label='Validation Accuracy', color='blue', linewidth=2)
+plt.title('Model Accuracy per Epoch', fontsize=13)
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.6)
+
+# Loss Plot
+plt.subplot(1, 2, 2)
+plt.plot(epochs, loss, label='Training Loss', color='red', linewidth=2)
+plt.plot(epochs, val_loss, label='Validation Loss', color='orange', linewidth=2)
+plt.title('Model Loss per Epoch', fontsize=13)
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.6)
+
+plt.tight_layout()
+
+# ------------------------------------------------
+# Step 3️⃣  Save and Display Graph
+# ------------------------------------------------
+graph_path = "/content/drive/MyDrive/SelectiveNoiseCancellationOutput/Accuracy_Loss_Curve.png"
+plt.savefig(graph_path)
+plt.show()
+
+print(f"✅ Accuracy/Loss graphs saved to: {graph_path}")
